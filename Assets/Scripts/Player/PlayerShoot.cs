@@ -9,7 +9,7 @@ public class PlayerShoot : MonoBehaviour, IWorldSpeedEffect
     public float shootRate = 0.5f;
 
     [SerializeField] AudioSource audioSource;
-    [SerializeField] AudioClip sfxShoot;
+    [SerializeField] AudioClip[] sfxShoot;
 
     private bool canShoot = true;
     private IEnumerator shootCR;
@@ -50,14 +50,14 @@ public class PlayerShoot : MonoBehaviour, IWorldSpeedEffect
                 break;
             }
             Shoot();
-            yield return new WaitForSeconds(shootRate * GameManager.worldSpeed);
+            yield return new WaitForSeconds(shootRate /  GameManager.worldSpeed);
         }
     }
 
     void Shoot()
     {
         Instantiate(projectilePrefab, muzzle.transform.position, transform.rotation);
-        audioSource.PlayOneShot(sfxShoot);
+        SoundManager.Instance.PlayeSFX(sfxShoot[Random.Range(0, sfxShoot.Length)]);
     }
 
     void StopShooting()

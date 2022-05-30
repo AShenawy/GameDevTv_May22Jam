@@ -18,11 +18,11 @@ public class UIPlayerHealth : MonoBehaviour
         {
             if (i < number)
             {
-                playerHealthBars[i].enabled = true;
+                playerHealthBars[i].gameObject.SetActive(true);
             }
             else
             {
-                playerHealthBars[i].enabled = false;
+                playerHealthBars[i].gameObject.SetActive(false);
             }
         }
     }

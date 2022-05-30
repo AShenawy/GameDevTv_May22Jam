@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     public static event Action<int> OnHpChanged;
+    public static event Action OnDestroyed;
 
     public float moveSpeed = 10f;
     public float rotationSpeed = 10f;
     public int hp;
+    public ParticleSystem deathParticlesPrefab;
 
     [SerializeField] LayerMask groundDetectMask;
     [SerializeField] AudioSource audioSource;
@@ -17,6 +19,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip sfxExplode;
     
     CameraManager camMan;
+
+    public EActorType ActorType => EActorType.Player;
 
     void Awake()
     {
@@ -77,24 +81,48 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag(GameManager.tagEnemy))
         {
-            TakeDamage(1);
+            TakeDamage(1, EActorType.Enemy);
             other.GetComponent<EnemyController>().Destroy();
         }
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, EActorType attacker)
     {
+        if (attacker == EActorType.Player)
+        {
+            return;
+        }
+
         hp -= amount;
         if (hp <= 0)
         {
             hp = 0;
-            audioSource.PlayOneShot(sfxExplode);
+            DestroyPlayer();
         }
         else
         {
-            audioSource.PlayOneShot(sfxTakeDamage);
+            SoundManager.Instance.PlayeSFX(sfxTakeDamage);
         }
 
         OnHpChanged?.Invoke(hp);
+    }
+
+    public void AddHp(int amount)
+    {
+        hp += amount;
+        if (hp > 3)
+        {
+            hp = 3;
+        }
+
+        OnHpChanged?.Invoke(hp);
+    }
+
+    void DestroyPlayer()
+    {
+        SoundManager.Instance.PlayeSFX(sfxExplode);
+        Destroy(gameObject);
+        Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+        OnDestroyed?.Invoke();
     }
 }

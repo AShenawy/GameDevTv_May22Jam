@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public Canvas uiCanvas;
+
+    [SerializeField] GameObject gameOverPanel;
     [SerializeField] GameManager gm;
     [SerializeField] UIPlayerHealth playerHpDisplay;
-    
+
     private void Awake()
     {
         PlayerController.OnHpChanged += UpdatePlayerHP;
@@ -26,5 +29,16 @@ public class UIManager : MonoBehaviour
     private void OnDestroy()
     {
         PlayerController.OnHpChanged -= UpdatePlayerHP;
+    }
+
+    public void NewGame()
+    {
+        gameOverPanel.SetActive(false);
+        UpdatePlayerHP(3);
+    }
+
+    public void GameOver()
+    {
+        gameOverPanel.SetActive(true);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,13 +12,17 @@ public class GameManager : MonoBehaviour
     public static float worldSpeed = 1f;
 
     public PlayerController player;
+    public UIManager uiMan;
 
     public const string tagPlayer = "Player";
     public const string tagEnemy = "Enemy";
+    public const string level1 = "Level";
+
 
     void Awake()
     {
         Instance = this;
+        PlayerController.OnDestroyed += GameOver;
     }
 
     private void Update()
@@ -65,5 +70,26 @@ public class GameManager : MonoBehaviour
         {
             worldSpeed = 1f;
         }
+    }
+
+    public void NewGame()
+    {
+        //player.hp = 3;
+        //player.transform.position = new Vector3(0f, 1f, 0f);
+        //uiMan.NewGame();
+        worldSpeed = 1;
+        SceneManager.LoadScene(level1);
+    }
+
+    public void GameOver()
+    {
+        StopCoroutine(nameof(SpeedUp));
+        StartCoroutine(nameof(SlowDown));
+        uiMan.GameOver();
+    }
+
+    private void OnDestroy()
+    {
+        PlayerController.OnDestroyed -= GameOver;
     }
 }
